@@ -1,6 +1,8 @@
 ﻿using NewsletterStudio.Services.RenderTasks;
 using NewsletterStudioContrib.RenderTasks.Utils.Peche33Task;
-using System;
+using System.Net.Mail;
+using System.Net.Mime;
+using System.Text;
 
 namespace NewsletterStudioContrib.RenderTasks
 {
@@ -14,25 +16,13 @@ namespace NewsletterStudioContrib.RenderTasks
 
         public override void ProcessUniqueItem(RenderResult renderResult, RenderTaskUniqueItemParameters parameters)
         {
-            Guid boundaryGuid = new Guid();
-
             HtmlToText converter = new HtmlToText();
             string originalHtml = renderResult.MessageBody;
             string textVersion = converter.ConvertHtml(originalHtml);
 
-            parameters.MailMessage.Headers["Content-Type"] = "multipart/alternative;boundary=" + boundaryGuid;
+            AlternateView textView = AlternateView.CreateAlternateViewFromString(textVersion, Encoding.UTF8, MediaTypeNames.Text.Plain);
+            parameters.MailMessage.AlternateViews.Add(textView);
 
-            renderResult.MessageBody = "\r\n\r\n" + boundaryGuid + "\r\n\r\n";
-
-            renderResult.MessageBody += "Content-Type: text/plain; charset=utf-8\r\n\r\n";
-            //renderResult.MessageBody += "Content-Transfer-Encoding: base64\r\n";
-            renderResult.MessageBody += "\r\n" + textVersion + "\r\n";
-            renderResult.MessageBody += "\r\n\r\n--" + boundaryGuid + "\r\n";
-
-            renderResult.MessageBody += "Content-Type: text/html; charset=utf-8\r\n\r\n";
-            //renderResult.MessageBody += "Content-Transfer-Encoding: base64\r\n";
-            renderResult.MessageBody += "\r\n" + originalHtml + "\r\n";
-            renderResult.MessageBody += "\r\n\r\n--" + boundaryGuid + "\r\n";
         }
     }
 }

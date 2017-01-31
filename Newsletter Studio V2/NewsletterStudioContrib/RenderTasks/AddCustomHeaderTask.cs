@@ -35,6 +35,7 @@ namespace NewsletterStudioContrib.RenderTasks
             listUnsubscribeUrl = listUnsubscribeUrl.Replace("[compress_newsletterId]", nid);
 
             parameters.MailMessage.Headers.Add("List-Unsubscribe", listUnsubscribeUrl);
+
         }
 
     }
